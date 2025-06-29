@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\HabitController;
+use App\Http\Controllers\HabitTrackingController;
 use App\Http\Controllers\TasksController;
 use Illuminate\Support\Facades\Route;
 
@@ -12,4 +13,6 @@ Route::post('/habits/add', [HabitController::class, 'store'])->name('habits.stor
 Route::get('/habits/{habit}/edit', [HabitController::class, 'edit'])->name('habits.edit');
 Route::post('/habits/{habit}/edit', [HabitController::class, 'update'])->name('habits.update');
 Route::post('/habits/{habit}/delete', [HabitController::class, 'destroy'])->name('habits.delete');
+Route::get('/habits/{habit}', [HabitController::class, 'show'])->name('habits.show');
 
+Route::post('/habits/{habit}/track', [HabitTrackingController::class, 'store'])->name('habits.track');

@@ -2,42 +2,52 @@
 
 @section('content')
 <div class="container py-4">
+    <h2 class="h4 fw-bold mb-4">Daftar Habits</h2>
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="h4 fw-bold mb-0">Daftar Habit</h2>
-        <a href="{{ route('habits.create') }}" class="btn btn-success">
-            + Tambah Habit
-        </a>
-    </div>
+    <a href="{{ route('habits.create') }}" class="btn btn-primary mb-4">
+        + Tambah Habit
+    </a>
 
     @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
-    <ul class="list-group">
-        @forelse ($habits as $habit)
-        <li class="list-group-item d-flex justify-content-between align-items-start mt-2">
-            <div class="ms-2 me-auto">
-                <div class="fw-semibold">{{ $habit->name }}</div>
-                <small class="text-muted">{{ $habit->description }}</small>
-                <span class="badge bg-primary ms-2">{{ $habit->type }}</span>
-            </div>
-            <div class="d-flex gap-2">
-                <a href="{{ route('habits.edit', $habit->id) }}"
-                    class="btn btn-sm btn-warning">Edit</a>
+    <div class="row g-3">
+        @forelse($habits as $habit)
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-1">{{ $habit->name }}</h5>
+                    <p class="card-text text-muted mb-2" style="min-height: 3em;">
+                        {{ $habit->description ?? '-' }}
+                    </p>
+                    <span class="badge bg-primary text-capitalize">{{ $habit->type }}</span>
+                </div>
+                <div class="card-footer bg-white border-0 d-flex justify-content-between">
+                    <a href="{{ route('habits.show', $habit->id) }}"
+                        class="btn btn-sm btn-info">Lihat</a>
 
-                <form action="{{ route('habits.delete', $habit->id) }}"
-                    method="POST"
-                    onsubmit="return confirm('Yakin ingin menghapus habit ini?')">
-                    @csrf
-                    <button class="btn btn-sm btn-danger">Hapus</button>
-                </form>
+                    <div class="d-flex gap-2">
+                        <a href="{{ route('habits.edit', $habit->id) }}"
+                            class="btn btn-sm btn-warning">Edit</a>
+
+                        <form action="{{ route('habits.delete', $habit->id) }}"
+                            method="POST"
+                            onsubmit="return confirm('Yakin ingin menghapus habit ini?')">
+                            @csrf
+                            <button class="btn btn-sm btn-danger">Hapus</button>
+                        </form>
+                    </div>
+                </div>
             </div>
-        </li>
+        </div>
         @empty
-        <li class="list-group-item text-center">Belum ada habit.</li>
+        <div class="col-12">
+            <div class="alert alert-info">
+                Belum ada habit yang ditambahkan.
+            </div>
+        </div>
         @endforelse
-    </ul>
-
+    </div>
 </div>
 @endsection

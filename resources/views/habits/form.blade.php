@@ -45,6 +45,27 @@
             @error('type') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
 
+        <div class="mb-3">
+            <label class="form-label">Jadwal Hari</label><br>
+            @php
+            $days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+            $selectedDays = isset($habit)
+            ? $habit->schedules->pluck('day')->toArray()
+            : [];
+            @endphp
+            @foreach ($days as $day)
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox"
+                    name="days[]"
+                    value="{{ $day }}"
+                    {{ in_array($day, old('days', $selectedDays)) ? 'checked' : '' }}>
+                <label class="form-check-label text-capitalize">{{ $day }}</label>
+            </div>
+            @endforeach
+            @error('days') <div class="text-danger small">{{ $message }}</div> @enderror
+        </div>
+
+
         <button class="btn btn-primary">
             {{ isset($habit) ? 'Update Habit' : 'Simpan Habit' }}
         </button>
