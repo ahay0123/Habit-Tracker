@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\HabitController;
 use App\Http\Controllers\HabitTrackingController;
 use App\Http\Controllers\TasksController;
@@ -16,3 +17,12 @@ Route::post('/habits/{habit}/delete', [HabitController::class, 'destroy'])->name
 Route::get('/habits/{habit}', [HabitController::class, 'show'])->name('habits.show');
 
 Route::post('/habits/{habit}/track', [HabitTrackingController::class, 'store'])->name('habits.track');
+
+Route::prefix('categories')->name('categories.')->group(function () {
+    Route::get('/', [CategoryController::class, 'index'])->name('index');
+    Route::get('/create', [CategoryController::class, 'create'])->name('create');
+    Route::post('/store', [CategoryController::class, 'store'])->name('store');
+    Route::get('/{category}/edit', [CategoryController::class, 'edit'])->name('edit');
+    Route::post('/{category}/update', [CategoryController::class, 'update'])->name('update');
+    Route::post('/{category}/delete', [CategoryController::class, 'destroy'])->name('delete');
+});

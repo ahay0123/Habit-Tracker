@@ -19,12 +19,16 @@ class Habit extends Model
 
     public function schedules()
     {
-        return $this->hasMany(HabitSchedule
-        ::class);
+        return $this->hasMany(HabitSchedule::class);
     }
 
     public function trackings()
     {
         return $this->hasMany(HabitTracking::class);
+    }
+
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class, 'habit_category');
     }
 }

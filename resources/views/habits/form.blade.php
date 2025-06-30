@@ -46,6 +46,29 @@
         </div>
 
         <div class="mb-3">
+            <label class="form-label">Kategori</label>
+            @php
+            $selectedCategories = isset($habit)
+            ? $habit->categories->pluck('id')->toArray()
+            : [];
+            @endphp
+            @foreach ($allCategories as $category)
+            <div class="form-check">
+                <input class="form-check-input"
+                    type="checkbox"
+                    name="categories[]"
+                    value="{{ $category->id }}"
+                    {{ in_array($category->id, old('categories', $selectedCategories)) ? 'checked' : '' }}>
+                <label class="form-check-label">
+                    {{ $category->name }}
+                </label>
+            </div>
+            @endforeach
+            @error('categories') <div class="text-danger small">{{ $message }}</div> @enderror
+        </div>
+
+
+        <div class="mb-3">
             <label class="form-label">Jadwal Hari</label><br>
             @php
             $days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];

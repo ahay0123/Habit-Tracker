@@ -2,22 +2,37 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Habit;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+
+use function PHPSTORM_META\type;
 
 class HabitController extends Controller
 {
     /**
      * Tampilkan semua habit milik user (sementara user #1).
      */
-    public function index()
+    public function index(Request $request)
     {
-        $userId = 1;                                         // TODO: ganti auth()->id() setelah login siap
+        $userId = 1;
+        $day = $request->query('day');
+        $type = $request->query('type');
         $habits = Habit::where('user_id', $userId)
-            ->latest()
-            ->get();
+            ->when($type, function ($query) use ($type) {
+                $query->where('type', $type);
+            })
+            ->when($day !== null && $day !== '', function ($query) use ($day) {
+                $query->whereHas('schedules', function ($q) use ($day) {
+                    $q->where('day', strtolower($day));
+                });
+            })
+                ->with('schedules')
+                ->latest()
+                ->get();
 
-        return view('habits.index', compact('habits'));
+        return view('habits.index', compact('habits', 'day', 'type'));
     }
 
     /**
@@ -25,7 +40,8 @@ class HabitController extends Controller
      */
     public function create()
     {
-        return view('habits.form');              // mode tambah
+        $allCategories = Category::where('user_id', 1)->get();
+        return view('habits.form', compact('allCategories'));              // mode tambah
     }
 
     /**
@@ -38,7 +54,7 @@ class HabitController extends Controller
             'description' => 'nullable|string',
             'type'        => 'required|in:habit,task',
             'days'        => 'required|array|min:1',
-            'days.*'      => 'in:monday,tuesday.wednesday.thursday,friday,saturday,sunday',
+            'days.*'      => 'in:monday,tuesday,wednesday,thursday,friday,saturday,sunday',
         ]);
 
         $validated['user_id'] = 1;                            // hard-code sementara
@@ -51,8 +67,10 @@ class HabitController extends Controller
         ]);
 
         foreach ($request->days as $day) {
-            $habit->schedules()->create(['days' => $day]);
+            $habit->schedules()->create(['day' => $day]);
         }
+
+        $habit->categories()->sync($request->categories ?? []);
 
         return redirect()
             ->route('habits.index')
@@ -73,7 +91,9 @@ class HabitController extends Controller
     public function edit(Habit $habit)
     {
         $habit->load('schedules');
-        return view('habits.form', compact('habit')); // mode edit
+        $allCategories = Category::where('user_id', 1)->get();
+        return view('habits.form', compact('habit', compact('allCategories'))); // mode edit
+
     }
 
     /**
@@ -86,15 +106,17 @@ class HabitController extends Controller
             'description' => 'nullable|string',
             'type'        => 'required|in:habit,task',
             'days'        => 'required|array|min:1',
-            'days.*'      => 'in:monday,tuesday.wednesday.thursday,friday,saturday,sunday',
+            'days.*'      => 'in:monday,tuesday,wednesday,thursday,friday,saturday,sunday',
         ]);
 
         $habit->update($validated);
 
         $habit->schedules()->delete();
-        foreach($request->days as $day) {
+        foreach ($request->days as $day) {
             $habit->schedules()->create(['day' => $day]);
         }
+
+        $habit->categories()->sync($request->categories ?? []);
 
         return redirect()
             ->route('habits.index')

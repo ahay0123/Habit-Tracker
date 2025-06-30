@@ -19,6 +19,7 @@
 
     <form method="POST" action="{{ route('habits.track', $habit->id) }}">
         @csrf
+        <input type="hidden" name="habit_id" value="{{ $habit->id }}">
         <button class="btn btn-sm btn-primary mb-3">
             Tandai Selesai Hari Ini
         </button>
